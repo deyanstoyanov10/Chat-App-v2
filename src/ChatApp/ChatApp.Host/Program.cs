@@ -27,6 +27,11 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     })
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true;
+});
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -55,6 +60,10 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "api",
+    pattern: "api/v{version:apiVersion}/{controller}/{action}");
 app.MapRazorPages();
 
 app.Run();
