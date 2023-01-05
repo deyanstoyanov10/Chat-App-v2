@@ -3,6 +3,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-//[Authorize]
+[Authorize]
 [Route("api/v{version:apiVersion}/[controller]")]
 public abstract class ApiController : ControllerBase {}

@@ -1,5 +1,12 @@
 using AspNetCore.SEOHelper;
+using ChatApp.Host.Common;
+using ChatApp.Host.Configuration;
 using ChatApp.Host.Data;
+using ChatApp.Host.Producer.Implementations;
+using ChatApp.Host.Producer.Interfaces;
+using ChatApp.Host.Services.Implementations;
+using ChatApp.Host.Services.Interfaces;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +22,18 @@ builder.Services.AddRouting(options =>
 {
     options.LowercaseUrls = true;
 });
+
+builder.Services
+    .Configure<ProducerConfig>(builder.Configuration.GetSection(nameof(ProducerConfig)))
+    .Configure<MessageLoggingConfig>(builder.Configuration.GetSection(nameof(MessageLoggingConfig)));
+
+builder.Services
+    .AddSingleton(typeof(ISerializer<>), typeof(Serializer<>))
+    .AddSingleton(typeof(IKafkaProducer<,>), typeof(KafkaProducer<,>))
+    .AddSingleton<IIdProvider, IdProvider>()
+    .AddSingleton<IDateTimeProvider, DateTimeProvider>()
+    .AddSingleton<IMessageService, MessageService>();
+
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => 
     {

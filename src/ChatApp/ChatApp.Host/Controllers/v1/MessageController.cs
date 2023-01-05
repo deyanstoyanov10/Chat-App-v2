@@ -1,6 +1,8 @@
 ﻿namespace ChatApp.Host.Controllers.v1;
 
-using ChatApp.Host.Models;
+using Models;
+using Services.Interfaces;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -8,14 +10,20 @@ using Microsoft.Extensions.Logging;
 public class MessageController : ApiController
 {
     private readonly ILogger<MessageController> _logger;
+    private readonly IMessageService _messageService;
 
-    public MessageController(ILogger<MessageController> logger) => _logger = logger;
+    public MessageController(
+        ILogger<MessageController> logger,
+        IMessageService messageService) => (_logger , _messageService) = (logger, messageService);
 
     [HttpPost]
     [Route("send")]
-    public IActionResult Send([FromBody] RequestMessage request)
+    public async Task<IActionResult> Send([FromBody] RequestMessage request)
     {
-        _logger.LogWarning(request?.Text);
+        var username = HttpContext?.User?.Identity?.Name;
+
+        await _messageService.SendMessage(username, request.Text);
+
         return Ok();
     }
 }
