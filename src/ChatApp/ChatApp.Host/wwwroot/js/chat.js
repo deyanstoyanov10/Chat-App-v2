@@ -1,5 +1,7 @@
 ﻿"use strict";
 
+let conn = null;
+
 function sendMessage() {
     let msg = String(document.getElementById('message').value);
 
@@ -21,6 +23,32 @@ function sendMessage() {
 
     event.preventDefault();
 }
+
+function buildMessage(message) {
+    let append = '';
+
+    append += '<li class="clearfix">';
+    append += '<div class="message-data"><p>' + message.userName + '<span class="message-data-time">' + message.sendDate + '</span></p></div>';
+    append += '<div class="message my-message">' + message.text + '</div>';
+    append += '</li>';
+
+    document.getElementById('chatHistory').innerHTML += append;
+}
+
+function setupConnection() {
+
+    conn = new signalR.HubConnectionBuilder().withUrl("https://localhost:7279/Websocket").build();
+
+    conn.on("ReceiveMessages", (response) => {
+        let messages = response.data
+        messages.forEach(buildMessage)
+        console.log(response);
+    });
+
+    conn.start().catch(err => console.error(err.toString()));
+}
+
+setupConnection();
 
 document.getElementById("sendMessage").addEventListener("click", function () {
     sendMessage();
