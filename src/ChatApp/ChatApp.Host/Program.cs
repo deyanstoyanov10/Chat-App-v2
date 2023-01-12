@@ -81,6 +81,11 @@ app.UseCors(x => x
          .AllowAnyMethod()
          .AllowAnyHeader());
 
+using var services = app.Services.CreateScope();
+var dbContext = services.ServiceProvider.GetService<ApplicationDbContext>();
+
+dbContext.Database.Migrate();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
